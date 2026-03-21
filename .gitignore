@@ -39,3 +39,52 @@
 
 # debug information files
 *.dwo
+.DS_Store
+build/
+.vscode/
+
+flow.md
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build output
+dist/
+/build
+# Vite-specific build output
+dist-ssr/
+
+# Environment files
+.env
+.env*.local
+
+# Logs and debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Coverage directory
+coverage/
+.nyc_output/
+
+# Editor/IDE-specific files (optional, but recommended)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store # macOS
+.gitignore.stackblitz.json # StackBlitz
+*.local # Vite local-only environment files
+
+# Temporary files
+tmp/
+temp/
+

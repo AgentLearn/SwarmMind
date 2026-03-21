@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drone Swarm Simulation</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #080818;
+      overflow: hidden;
+      font-family: 'Courier New', Courier, monospace;
+      color: #aabbdd;
+    }
+
+    canvas { display: block; }
+
+    /* ── HUD ── */
+    #hud {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .panel {
+      background: rgba(4, 8, 24, 0.75);
+      border: 1px solid rgba(100, 140, 255, 0.25);
+      border-radius: 6px;
+      padding: 10px 14px;
+      backdrop-filter: blur(4px);
+      font-size: 12px;
+    }
+
+    .panel.alpha { border-color: rgba(60, 130, 255, 0.5); }
+    .panel.beta  { border-color: rgba(255, 60, 60,  0.5); }
+
+    .panel-title {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      opacity: 0.7;
+    }
+    .alpha .panel-title { color: #4488ff; }
+    .beta  .panel-title { color: #ff4444; }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .big-count {
+      font-size: 28px;
+      font-weight: bold;
+      min-width: 36px;
+      line-height: 1;
+    }
+    .alpha .big-count { color: #6699ff; }
+    .beta  .big-count { color: #ff6666; }
+
+    .bar-group { display: flex; flex-direction: column; gap: 4px; }
+    .bar-label { font-size: 9px; color: #556677; letter-spacing: 1px; }
+
+    .bar-bg {
+      width: 130px;
+      height: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 80ms linear;
+    }
+    .alpha .bar-fill { background: #4488ff; }
+    .beta  .bar-fill { background: #ff4444; }
+
+    #tick-panel { color: #445566; font-size: 11px; }
+    #tick-panel span { color: #8899aa; }
+
+    #status-panel { font-size: 11px; }
+    #conn-status { font-weight: bold; }
+
+    #phase-banner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.85);
+      border: 1px solid rgba(255,200,50,0.5);
+      border-radius: 8px;
+      padding: 18px 32px;
+      font-size: 18px;
+      letter-spacing: 4px;
+      color: #ffcc33;
+      text-align: center;
+      display: none;
+      pointer-events: none;
+    }
+
+    /* ── Legend ── */
+    #legend {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(4, 8, 24, 0.75);
+      border: 1px solid rgba(100, 140, 255, 0.2);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 11px;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
+    #legend .title { color: #445566; letter-spacing: 2px; font-size: 9px; margin-bottom: 7px; }
+    .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Controls hint ── */
+    #controls-hint {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(4, 8, 24, 0.65);
+      border: 1px solid rgba(100, 140, 255, 0.15);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 10px;
+      color: #445566;
+      pointer-events: none;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="panel" id="tick-panel">
+      TICK <span id="tick">0</span>
+    </div>
+
+    <div class="panel alpha">
+      <div class="panel-title">▲ Alpha Swarm</div>
+      <div class="stat-row">
+        <div class="big-count" id="alpha-count">–</div>
+        <div class="bar-group">
+          <div class="bar-label">DRONES ALIVE</div>
+          <div class="bar-bg"><div class="bar-fill" id="alpha-alive-bar" style="width:100%"></div></div>
+          <div class="bar-label">AVG HEALTH</div>
+          <div class="bar-bg"><div class="bar-fill" id="alpha-hp-bar" style="width:100%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel beta">
+      <div class="panel-title">▼ Beta Swarm</div>
+      <div class="stat-row">
+        <div class="big-count" id="beta-count">–</div>
+        <div class="bar-group">
+          <div class="bar-label">DRONES ALIVE</div>
+          <div class="bar-bg"><div class="bar-fill" id="beta-alive-bar" style="width:100%"></div></div>
+          <div class="bar-label">AVG HEALTH</div>
+          <div class="bar-bg"><div class="bar-fill" id="beta-hp-bar" style="width:100%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="status-panel">
+      WS&nbsp;<span id="conn-status" style="color:#f84">CONNECTING</span>
+    </div>
+  </div>
+
+  <!-- Phase banner (shown when battle ends) -->
+  <div id="phase-banner"></div>
+
+  <!-- Legend -->
+  <div id="legend">
+    <div class="title">STATE LEGEND</div>
+    <div class="legend-row"><div class="dot" style="background:#ff6600"></div>Attacking</div>
+    <div class="legend-row"><div class="dot" style="background:#00ccff"></div>Flanking</div>
+    <div class="legend-row"><div class="dot" style="background:#ffee00"></div>Retreating</div>
+    <div class="legend-row"><div class="dot" style="background:#ffffff"></div>Patrolling</div>
+    <div class="legend-row"><div class="dot" style="background:#333333"></div>Dead</div>
+  </div>
+
+  <div id="controls-hint">
+    Drag · Scroll to zoom · Right-drag to pan
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
