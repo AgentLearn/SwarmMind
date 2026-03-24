@@ -4,22 +4,22 @@ Platform for testing distribute intelligences.
 ## Initial Version: Dumb Swarms Arial Compat
 
 Two opposing drone swarms fight in 3D. Each drone runs a **decision tree**
-every tick. The server is built with C++23, websocketpp, and standalone Asio.
-The frontend is identical to the Go and Rust versions (same JSON wire format).
+every tick. The server is built with C++23, websockets, and streams 
+world state over WebSockets to a Three.js frontend.
 
 
 ### 1. Build the C++ server
 
 ```bash
-cd dronesim-cpp
+cd SwarmMind-cpp
 
-# Configure (downloads nlohmann/json, asio, websocketpp automatically)
+# Configure (downloads glaze, asio, websocketpp automatically)
 cmake --preset release
 
 # Build
 cmake --build --preset release
 
-# The binary is at:  build/release/dronesim
+# The binary is at:  build/release/SwarmMind
 ```
 
 ### 2. Build the frontend
@@ -34,9 +34,9 @@ cd ..
 ### 3. Run
 
 ```bash
-./build/release/dronesim
+./build/release/SwarmMind
 # With options:
-./build/release/dronesim --port 8080 --drones 20
+./build/release/SwarmMind --port 8080 --drones 20
 ```
 
 Open **http://localhost:8080**
@@ -47,7 +47,7 @@ Open **http://localhost:8080**
 
 ```bash
 # Terminal 1
-./build/debug/dronesim
+./build/debug/SwarmMind
 
 # Terminal 2
 cd frontend && npm run dev    # → http://localhost:5173, /ws proxied to :8080

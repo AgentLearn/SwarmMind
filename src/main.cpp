@@ -36,7 +36,7 @@ struct Config {
         if      (arg == "--port"   || arg == "-p") parse_uint(cfg.port);
         else if (arg == "--drones" || arg == "-d") parse_uint(cfg.drones);
         else if (arg == "--help"   || arg == "-h") {
-            std::println("Usage: dronesim [--port N] [--drones N]");
+            std::println("Usage: SwarmMind [--port N] [--drones N]");
             std::println("  --port   N  HTTP/WebSocket port     (default: 8080)");
             std::println("  --drones N  Drones per team (×2)    (default: 15)");
             std::exit(0);
