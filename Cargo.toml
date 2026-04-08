@@ -1,0 +1,30 @@
+[package]
+name    = "dronesim"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "dronesim"
+path = "src/main.rs"
+
+[dependencies]
+# Async web framework with WebSocket support
+axum          = { version = "0.7", features = ["ws"] }
+tokio         = { version = "1",   features = ["full"] }
+
+# Serialisation — derive macros make JSON trivial
+serde         = { version = "1",   features = ["derive"] }
+serde_json    = "1"
+
+# Static file serving for the compiled frontend
+tower-http    = { version = "0.5", features = ["fs"] }
+
+# RNG
+rand          = "0.8"
+
+# CLI flags
+clap          = { version = "4",   features = ["derive"] }
+
+# Logging
+tracing       = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
