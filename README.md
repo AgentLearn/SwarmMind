@@ -7,20 +7,16 @@ Two opposing drone swarms fight in 3D. Each drone runs a **decision tree**
 every tick. The server is built with C++23, websockets, and streams 
 world state over WebSockets to a Three.js frontend.
 
-
-### 1. Build the C++ server
+### 1 · Build & run the server
 
 ```bash
-cd SwarmMind-cpp
+cd dronesim-rs
+cargo run --release
 
-# Configure (downloads glaze, asio, websocketpp automatically)
-cmake --preset release
-
-# Build
-cmake --build --preset release
-
-# The binary is at:  build/release/SwarmMind
+# With options:
+cargo run --release -- --drones 20 --addr 0.0.0.0:8080
 ```
+
 
 ### 2. Build the frontend
 
@@ -33,27 +29,21 @@ cd ..
 
 ### 3. Run
 
-```bash
-./build/release/SwarmMind
-# With options:
-./build/release/SwarmMind --port 8080 --drones 20
-```
-
-Open **http://localhost:8080**
-
----
-
 ## Development mode (hot-reload frontend)
 
 ```bash
 # Terminal 1
-./build/debug/SwarmMind
+cargo run
 
 # Terminal 2
 cd frontend && npm run dev    # → http://localhost:5173, /ws proxied to :8080
 ```
 
 ---
+
+
+Open **http://localhost:8080**
+
 
 ## CLI Flags
 
